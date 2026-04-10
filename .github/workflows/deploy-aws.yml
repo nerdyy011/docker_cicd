@@ -1,0 +1,26 @@
+name: Deploy React to AWS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - run: zip -r deploy.zip . -x '*.git*'
+
+      - uses: einaregilsson/beanstalk-deploy@v20
+        with:
+          application_name: docker-react
+          environment_name: docker-react-env
+          version_label: ${{ github.sha }}
+          region: eu-west-3
+          deployment_package: deploy.zip
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          existing_bucket_name: elasticbeanstalk-eu-west-3-011237053538
